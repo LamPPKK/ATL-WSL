@@ -7,6 +7,7 @@
     <Deterministic>true</Deterministic>
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
     <Version>$([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)VERSION').Trim())</Version>
-    <RuntimeFrameworkVersion>10.0.11</RuntimeFrameworkVersion>
+    <!-- SDK 10.0.400 supplies runtime 10.0.11. A global RuntimeFrameworkVersion
+         also overrides the WPF Windows SDK reference and causes NU1505. -->
   </PropertyGroup>
 </Project>

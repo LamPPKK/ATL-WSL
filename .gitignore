@@ -5,6 +5,10 @@
 artifacts/
 bin/
 obj/
+!rootfs/overlay/usr/bin/
+!rootfs/overlay/usr/bin/atl-wsl
 TestResults/
 *.user
 *.suo
+__pycache__/
+*.pyc
