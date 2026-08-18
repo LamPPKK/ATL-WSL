@@ -44,7 +44,7 @@ jobs:
         with:
           dotnet-version: 10.0.400
       - name: Build manager
-        run: dotnet build .\ATLWSL.slnx --configuration Release --runtime ${{ matrix.rid }}
+        run: dotnet build .\src\ATLWSL.Manager\ATLWSL.Manager.csproj --configuration Release --runtime ${{ matrix.rid }}
       - name: Test manager bridge
         run: dotnet run --project .\tests\ATLWSL.Core.Smoke\ATLWSL.Core.Smoke.csproj --configuration Release
       - name: Parse PowerShell scripts
