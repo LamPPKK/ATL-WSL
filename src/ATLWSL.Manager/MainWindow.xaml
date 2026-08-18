@@ -1,0 +1,444 @@
+<Window x:Class="AtlWsl.Manager.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:core="clr-namespace:AtlWsl.Core;assembly=ATLWSL.Core"
+        mc:Ignorable="d"
+        Title="ATL-WSL Manager"
+        Width="1240"
+        Height="780"
+        MinWidth="1040"
+        MinHeight="680"
+        WindowStartupLocation="CenterScreen"
+        UseLayoutRounding="True"
+        Loaded="Window_Loaded">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="32" />
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="MainContent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="206" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition x:Name="OptionsColumn" Width="354" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0"
+                    Background="{DynamicResource SurfaceAltBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="0,0,1,0">
+                <Grid Margin="18,22,18,18">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="30" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Border Width="42" Height="42" CornerRadius="11" Background="#172033">
+                            <Grid>
+                                <TextBlock Text="↔" Foreground="#4DA3FF" FontSize="26"
+                                           FontWeight="SemiBold" HorizontalAlignment="Center"
+                                           VerticalAlignment="Center" />
+                                <Ellipse Width="6" Height="6" Fill="#54C77A"
+                                         HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,8,8,0" />
+                            </Grid>
+                        </Border>
+                        <StackPanel Margin="11,1,0,0">
+                            <TextBlock Text="ATL-WSL" FontSize="18" FontWeight="SemiBold" />
+                            <TextBlock Text="App manager" Foreground="{DynamicResource MutedTextBrush}" FontSize="12" />
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="2">
+                        <Button x:Name="OverviewNavButton" Style="{StaticResource NavigationButton}"
+                                Click="ShowOverview_Click" AutomationProperties.Name="Overview">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="" FontFamily="Segoe Fluent Icons" FontSize="16" Width="26" />
+                                <TextBlock Text="Overview" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="LibraryNavButton" Style="{StaticResource NavigationButton}"
+                                Click="ShowLibrary_Click" AutomationProperties.Name="Library">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="" FontFamily="Segoe Fluent Icons" FontSize="16" Width="26" />
+                                <TextBlock Text="Library" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="DiagnosticsNavButton" Style="{StaticResource NavigationButton}"
+                                Click="ShowDiagnostics_Click" AutomationProperties.Name="Diagnostics">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="" FontFamily="Segoe Fluent Icons" FontSize="16" Width="26" />
+                                <TextBlock Text="Diagnostics" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="SettingsNavButton" Style="{StaticResource NavigationButton}"
+                                Click="ShowSettings_Click" AutomationProperties.Name="Settings">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="" FontFamily="Segoe Fluent Icons" FontSize="16" Width="26" />
+                                <TextBlock Text="Settings" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <Border Grid.Row="3" Padding="10" CornerRadius="8" Background="{DynamicResource SurfaceBrush}">
+                        <StackPanel>
+                            <StackPanel Orientation="Horizontal">
+                                <Ellipse x:Name="ConnectionDot" Width="8" Height="8"
+                                         Fill="{DynamicResource WarningBrush}" Margin="0,1,8,0" />
+                                <TextBlock x:Name="ConnectionStatusText" Text="Checking WSL…" FontWeight="SemiBold" />
+                            </StackPanel>
+                            <TextBlock x:Name="DistroSummaryText" Text="ATL-WSL"
+                                       Foreground="{DynamicResource MutedTextBrush}"
+                                       FontSize="11" Margin="16,4,0,0" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid x:Name="OverviewPanel" Grid.Column="1" Grid.ColumnSpan="2" Margin="30,24,30,24">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <StackPanel>
+                    <TextBlock Text="Overview" FontSize="28" FontWeight="SemiBold" />
+                    <TextBlock Text="Install, update, repair, diagnose, and safely remove ATL-WSL."
+                               Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
+                </StackPanel>
+                <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <StackPanel MaxWidth="820" HorizontalAlignment="Left">
+                        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1" CornerRadius="10" Padding="22">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="RUNTIME STATE" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" />
+                                    <TextBlock x:Name="LifecycleStateText" Text="notInstalled" FontSize="20" FontWeight="SemiBold" Margin="0,5,0,0"
+                                               AutomationProperties.Name="Runtime lifecycle state" />
+                                    <TextBlock x:Name="LifecycleDetailText" Text="Distribution: ATL-WSL" Margin="0,5,0,0" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="1" Margin="28,0,0,0">
+                                    <TextBlock Text="INSTALLED" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" />
+                                    <TextBlock x:Name="LifecycleVersionText" Text="Not installed" FontWeight="SemiBold" />
+                                    <TextBlock Text="AVAILABLE" Foreground="{DynamicResource MutedTextBrush}" FontSize="11" Margin="0,10,0,0" />
+                                    <TextBlock x:Name="AvailableVersionText" Text="Checking…" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <WrapPanel Margin="0,16,0,0">
+                            <Button Content="Install" Click="InstallRuntime_Click" Style="{StaticResource PrimaryButton}" Margin="0,0,10,10"
+                                    AutomationProperties.HelpText="Install the verified native ATL-WSL artifact." />
+                            <Button Content="Update" Click="UpdateRuntime_Click" Margin="0,0,10,10" />
+                            <Button Content="Repair" Click="RepairRuntime_Click" Margin="0,0,10,10" />
+                            <Button Content="Run diagnostics" Click="Doctor_Click" Margin="0,0,10,10" />
+                        </WrapPanel>
+                        <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1" CornerRadius="10" Padding="22" Margin="0,12,0,0">
+                            <StackPanel>
+                                <TextBlock Text="SAFE UNINSTALL" FontWeight="SemiBold" />
+                                <TextBlock Text="By default only the manager is detached. The distro, APKs, and app data remain."
+                                           Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,10" />
+                                <CheckBox x:Name="RemoveDistroDataBox" Content="Permanently unregister the distro and delete its data" />
+                                <CheckBox x:Name="ExportDistroBox" Content="Export a VHDX backup to Desktop first" IsChecked="True" />
+                                <TextBlock Text="Type the exact distribution name to authorize permanent removal" Margin="0,8,0,5" />
+                                <TextBox x:Name="DistroConfirmationBox" AutomationProperties.Name="Distribution removal confirmation" />
+                                <Button Content="Uninstall" Click="UninstallRuntime_Click" Style="{StaticResource DangerButton}"
+                                        HorizontalAlignment="Left" Margin="0,12,0,0" />
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <Grid x:Name="LibraryPanel" Grid.Column="1" Margin="30,24,24,22">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="App library" FontSize="28" FontWeight="SemiBold" />
+                        <TextBlock Text="Add compatible APKs and launch them through ATL."
+                                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Button Content="Refresh" Click="Refresh_Click" Margin="0,0,8,0"
+                                AutomationProperties.Name="Refresh app library" />
+                        <Button Content="＋  Add APK" Style="{StaticResource PrimaryButton}"
+                                Click="AddApk_Click" AutomationProperties.Name="Add APK" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid Grid.Row="2">
+                    <ListBox x:Name="AppsList"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             SelectionChanged="AppsList_SelectionChanged"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type core:AppInfo}">
+                                <Border x:Name="Card">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="{DynamicResource SurfaceBrush}" />
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                                            <Setter Property="BorderThickness" Value="1" />
+                                            <Setter Property="CornerRadius" Value="10" />
+                                            <Setter Property="Padding" Value="17" />
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                    <Setter Property="Background" Value="{DynamicResource SurfaceAltBrush}" />
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding IsSelected, RelativeSource={RelativeSource AncestorType=ListBoxItem}}" Value="True">
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                                                    <Setter Property="BorderThickness" Value="2" />
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="48" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <Border Width="40" Height="40" CornerRadius="9"
+                                                Background="{DynamicResource AccentSoftBrush}"
+                                                VerticalAlignment="Top">
+                                            <TextBlock Text="A" FontSize="18" FontWeight="Bold"
+                                                       Foreground="{DynamicResource AccentBrush}"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" Margin="3,0,14,0">
+                                            <TextBlock Text="{Binding DisplayName}" FontSize="16" FontWeight="SemiBold"
+                                                       TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding SourceFileName}" Foreground="{DynamicResource MutedTextBrush}"
+                                                       Margin="0,3,0,0" TextTrimming="CharacterEllipsis" />
+                                            <TextBlock Text="{Binding CompatibilityReason}" Foreground="{DynamicResource MutedTextBrush}"
+                                                       FontSize="11" Margin="0,7,0,0" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="2" HorizontalAlignment="Right">
+                                            <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="10" Padding="9,3">
+                                                <TextBlock Text="{Binding ArchitectureSummary}" FontSize="11" />
+                                            </Border>
+                                            <TextBlock Text="{Binding SizeSummary}" Foreground="{DynamicResource MutedTextBrush}"
+                                                       FontSize="11" Margin="0,8,2,0" HorizontalAlignment="Right" />
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+
+                    <StackPanel x:Name="EmptyLibraryPanel" HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <Border Width="72" Height="72" CornerRadius="20" Background="{DynamicResource AccentSoftBrush}">
+                            <TextBlock Text="＋" FontSize="36" Foreground="{DynamicResource AccentBrush}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <TextBlock Text="Your library is empty" FontSize="18" FontWeight="SemiBold"
+                                   HorizontalAlignment="Center" Margin="0,16,0,0" />
+                        <TextBlock Text="Choose an APK to check its architecture and add it."
+                                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,6,0,16" />
+                        <Button Content="Add your first APK" Style="{StaticResource PrimaryButton}"
+                                HorizontalAlignment="Center" Click="AddApk_Click" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <Border x:Name="OptionsPanel" Grid.Column="2"
+                    Background="{DynamicResource SurfaceBrush}"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1,0,0,0">
+                <Grid Margin="24">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <TextBlock Text="Launch options" FontSize="20" FontWeight="SemiBold" />
+                        <TextBlock Text="Saved separately for each app."
+                                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,3,0,0" />
+                    </StackPanel>
+
+                    <Grid Grid.Row="1">
+                        <TextBlock x:Name="NoSelectionText" Text="Select an app to configure it."
+                                   Foreground="{DynamicResource MutedTextBrush}"
+                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        <ScrollViewer x:Name="OptionsEditor" Visibility="Collapsed" VerticalScrollBarVisibility="Auto">
+                            <StackPanel Margin="0,22,4,8">
+                                <TextBlock Text="DISPLAY NAME" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedTextBrush}" />
+                                <TextBox x:Name="DisplayNameBox" Margin="0,5,0,14" MaxLength="128"
+                                         AutomationProperties.Name="Display name" />
+
+                                <TextBlock Text="WINDOW SIZE" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedTextBrush}" />
+                                <Grid Margin="0,5,0,14">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="26" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox x:Name="WidthBox" ToolTip="Width, 64 to 8192"
+                                             AutomationProperties.Name="Window width" />
+                                    <TextBlock Grid.Column="1" Text="×" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                               Foreground="{DynamicResource MutedTextBrush}" />
+                                    <TextBox x:Name="HeightBox" Grid.Column="2" ToolTip="Height, 64 to 8192"
+                                             AutomationProperties.Name="Window height" />
+                                </Grid>
+
+                                <TextBlock Text="ACTIVITY (OPTIONAL)" FontSize="11" FontWeight="SemiBold"
+                                           Foreground="{DynamicResource MutedTextBrush}" />
+                                <TextBox x:Name="ActivityBox" Margin="0,5,0,14"
+                                         AutomationProperties.Name="Android activity" />
+
+                                <CheckBox x:Name="FullscreenBox" Content="Fullscreen" />
+                                <CheckBox x:Name="WebViewBox" Content="Enable experimental WebView" />
+                                <CheckBox x:Name="ValidateCertificatesBox" Content="Validate certificates" />
+                                <CheckBox x:Name="DirectEglBox" Content="Use direct EGL (experimental)" />
+                                <CheckBox x:Name="LocationBox" Content="Location access (experimental)" />
+
+                                <Border Background="{DynamicResource SurfaceAltBrush}" CornerRadius="7" Padding="11" Margin="0,12,0,0">
+                                    <TextBlock Text="Rendering is fixed to Mesa llvmpipe. ATL implements a subset of Android APIs, so compatible architecture alone does not guarantee launch success."
+                                               Foreground="{DynamicResource MutedTextBrush}" FontSize="11" TextWrapping="Wrap" />
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+
+                    <Grid Grid.Row="2" x:Name="OptionActions" Visibility="Collapsed" Margin="0,16,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="8" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Button Content="Remove" Style="{StaticResource DangerButton}" Click="Remove_Click" />
+                        <Button Grid.Column="2" Content="Save" Click="Save_Click" />
+                        <Button Grid.Column="4" Content="Launch" Style="{StaticResource PrimaryButton}"
+                                Click="Launch_Click" />
+                    </Grid>
+                </Grid>
+            </Border>
+
+            <Grid x:Name="DiagnosticsPanel" Grid.Column="1" Grid.ColumnSpan="2"
+                  Margin="30,24" Visibility="Collapsed">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="20" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid>
+                    <StackPanel>
+                        <TextBlock Text="Diagnostics" FontSize="28" FontWeight="SemiBold" />
+                        <TextBlock Text="Verify WSLg, ATL and the software-rendering path."
+                                   Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Content="Run checks" Click="Doctor_Click" Margin="0,0,8,0" />
+                        <Button Content="Export support ZIP" Style="{StaticResource PrimaryButton}" Click="ExportDiagnostics_Click" />
+                    </StackPanel>
+                </Grid>
+                <Grid Grid.Row="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="3*" />
+                        <ColumnDefinition Width="18" />
+                        <ColumnDefinition Width="2*" />
+                    </Grid.ColumnDefinitions>
+                    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="System checks" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12" />
+                            <ItemsControl x:Name="HealthChecksItems">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,7">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="26" />
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Glyph}" Foreground="{Binding Brush}" FontWeight="Bold" />
+                                            <TextBlock Grid.Column="1" Text="{Binding Name}" />
+                                            <TextBlock Grid.Column="2" Text="{Binding Status}" Foreground="{Binding Brush}" FontWeight="SemiBold" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="2" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="20">
+                        <StackPanel>
+                            <TextBlock Text="Environment" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,14" />
+                            <TextBlock Text="DISTRIBUTION" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+                            <TextBlock x:Name="DoctorDistroText" Margin="0,3,0,12" />
+                            <TextBlock Text="ARCHITECTURE" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+                            <TextBlock x:Name="DoctorArchitectureText" Margin="0,3,0,12" />
+                            <TextBlock Text="RENDERER" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+                            <TextBlock x:Name="DoctorRendererText" Margin="0,3,0,12" />
+                            <TextBlock Text="VERSION" FontSize="11" Foreground="{DynamicResource MutedTextBrush}" />
+                            <TextBlock x:Name="DoctorVersionText" Margin="0,3,0,12" />
+                            <TextBlock Text="Compatibility is app-specific. Export the support ZIP when reporting a launch problem."
+                                       Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,12,0,0" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Grid>
+
+            <Grid x:Name="SettingsPanel" Grid.Column="1" Grid.ColumnSpan="2"
+                  Margin="30,24" Visibility="Collapsed">
+                <StackPanel MaxWidth="720" HorizontalAlignment="Left">
+                    <TextBlock Text="Settings" FontSize="28" FontWeight="SemiBold" />
+                    <TextBlock Text="Choose the installed WSL distribution managed by this app."
+                               Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,24" />
+                    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="22">
+                        <StackPanel>
+                            <TextBlock Text="WSL distribution name" FontSize="16" FontWeight="SemiBold" />
+                            <TextBlock Text="The safe installer defaults to ATL-WSL and never replaces an existing distribution."
+                                       Foreground="{DynamicResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,12" />
+                            <TextBox x:Name="DistroNameBox" Text="ATL-WSL" Width="360" HorizontalAlignment="Left"
+                                     AutomationProperties.Name="WSL distribution name" />
+                            <Button Content="Apply" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Left"
+                                    Margin="0,14,0,0" Click="ApplySettings_Click" />
+                        </StackPanel>
+                    </Border>
+                    <Border Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1" CornerRadius="10" Padding="22" Margin="0,16,0,0">
+                        <StackPanel>
+                            <TextBlock x:Name="AboutVersionText" Text="ATL-WSL" FontSize="16" FontWeight="SemiBold" />
+                            <TextBlock Text="Alpine 3.24 · software rendering · GPL-3.0-only"
+                                       Foreground="{DynamicResource MutedTextBrush}" Margin="0,4,0,0" />
+                            <TextBlock Text="No APK is bundled. Add only applications you are authorized to use."
+                                       Foreground="{DynamicResource MutedTextBrush}" Margin="0,10,0,0" />
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="1" Background="{DynamicResource SurfaceAltBrush}"
+                BorderBrush="{DynamicResource BorderBrush}" BorderThickness="0,1,0,0">
+            <Grid Margin="12,0">
+                <TextBlock x:Name="StatusText" Text="Ready" VerticalAlignment="Center"
+                           Foreground="{DynamicResource MutedTextBrush}" FontSize="11" />
+                <ProgressBar x:Name="BusyProgress" Width="120" Height="3" HorizontalAlignment="Right"
+                             IsIndeterminate="True" Visibility="Collapsed" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

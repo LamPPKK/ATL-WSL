@@ -1,0 +1,16 @@
+PackageIdentifier: OpenSource.ATLWSL
+PackageVersion: 0.2.0
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+  - RelativeFilePath: ATL-WSL Manager.exe
+    PortableCommandAlias: atl-wsl-manager
+Installers:
+  - Architecture: x64
+    InstallerUrl: https://github.com/LamPPKK/ATL-WSL/releases/download/v0.2.0/ATL-WSL-Manager-0.2.0-win-x64.zip
+    InstallerSha256: RELEASE_PIPELINE_REPLACES_THIS_VALUE
+  - Architecture: arm64
+    InstallerUrl: https://github.com/LamPPKK/ATL-WSL/releases/download/v0.2.0/ATL-WSL-Manager-0.2.0-win-arm64.zip
+    InstallerSha256: RELEASE_PIPELINE_REPLACES_THIS_VALUE
+ManifestType: installer
+ManifestVersion: 1.10.0

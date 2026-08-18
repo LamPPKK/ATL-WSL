@@ -1,0 +1,67 @@
+#!/bin/sh
+
+set -eu
+
+state_dir=/var/lib/atl-wsl
+marker="$state_dir/oobe.complete"
+default_user=atl
+
+if [ -f "$marker" ]; then
+    exit 0
+fi
+
+printf '\nATL-WSL first-run setup\n'
+printf 'Linux user name [%s]: ' "$default_user"
+if ! IFS= read -r requested_user; then
+    requested_user=
+fi
+user_name=${requested_user:-$default_user}
+
+case "$user_name" in
+    root|[0-9-]*|*[!a-z0-9_-]*|'')
+        printf 'Invalid user name; using %s.\n' "$default_user"
+        user_name=$default_user
+        ;;
+esac
+if [ "${#user_name}" -gt 32 ]; then
+    printf 'User name is too long; using %s.\n' "$default_user"
+    user_name=$default_user
+fi
+
+if id "$user_name" >/dev/null 2>&1 && [ "$(id -u "$user_name")" -ne 1000 ]; then
+    printf 'That name belongs to a system account; using %s.\n' "$default_user"
+    user_name=$default_user
+fi
+
+uid_owner="$(getent passwd 1000 | cut -d: -f1)"
+if [ -n "$uid_owner" ] && [ "$uid_owner" != "$user_name" ]; then
+    printf 'UID 1000 already belongs to %s; cannot create %s safely.\n' "$uid_owner" "$user_name" >&2
+    exit 1
+fi
+
+if id "$user_name" >/dev/null 2>&1; then
+    if [ "$(id -u "$user_name")" -ne 1000 ]; then
+        printf 'Existing user %s does not own UID 1000.\n' "$user_name" >&2
+        exit 1
+    fi
+else
+    adduser -D -u 1000 -s /bin/ash "$user_name"
+fi
+
+for group in audio video input render; do
+    if getent group "$group" >/dev/null 2>&1; then
+        addgroup "$user_name" "$group" 2>/dev/null || true
+    fi
+done
+
+install -d -m 0700 -o "$user_name" -g "$user_name" "/home/$user_name/.local/share/atl-wsl"
+install -d -m 0700 -o "$user_name" -g "$user_name" "/home/$user_name/.local/state/atl-wsl/logs"
+install -d -m 0755 "$state_dir"
+printf '%s\n' "$user_name" > "$state_dir/default-user"
+
+if ! grep -q '^\[user\]$' /etc/wsl.conf; then
+    printf '\n[user]\ndefault=%s\n' "$user_name" >> /etc/wsl.conf
+fi
+touch "$marker"
+
+printf '\nSetup complete. Run "atl-wsl doctor" to verify WSLg.\n'

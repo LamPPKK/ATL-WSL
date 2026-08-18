@@ -1,0 +1,10 @@
+.build/
+.cache/
+.vs/
+.vscode/
+artifacts/
+bin/
+obj/
+TestResults/
+*.user
+*.suo

@@ -1,0 +1,32 @@
+{
+  "$schema": "./release-manifest.schema.json",
+  "schemaVersion": 2,
+  "product": "atl-wsl",
+  "version": "0.2.0",
+  "channel": "development",
+  "publishedAtUtc": "1970-01-01T00:00:00Z",
+  "minimumManagerVersion": "0.2.0",
+  "minimumWslVersion": "2.4.4",
+  "signingKeyId": "release-2026",
+  "components": {
+    "alpine": "3.24.1",
+    "aports": "3535d18cfaaf91a9a0d40245c516195dbf97de5e",
+    "atl": "c1f2365fbce70243331f7f82eb1b9ad2739fc522",
+    "artStandalone": "e78bf68917bcaaf58fef3960cd88793b3b7f39cc",
+    "bionicTranslation": "5c31d4366fbb0af70690e72e5a861e7b44ffb1ef",
+    "libOpenSlesStandalone": "bdb857a4baadbc8c036db85a5da26c5269a751c5"
+  },
+  "compatibility": {
+    "supportedArchitectures": ["x64", "arm64"],
+    "renderer": "llvmpipe",
+    "tier": "experimental-runtime"
+  },
+  "artifacts": [
+    { "role": "rootfs", "architecture": "x64", "fileName": "ATL-WSL-0.2.0-x64.wsl", "url": "", "sha256": "", "sizeBytes": 0, "mediaType": "application/vnd.microsoft.wsl" },
+    { "role": "manager", "architecture": "x64", "fileName": "ATL-WSL-Manager-0.2.0-win-x64.zip", "url": "", "sha256": "", "sizeBytes": 0, "mediaType": "application/zip" },
+    { "role": "runtimeBundle", "architecture": "x64", "fileName": "ATL-WSL-Runtime-0.2.0-x64.tar.gz", "url": "", "sha256": "", "sizeBytes": 0, "mediaType": "application/gzip" },
+    { "role": "rootfs", "architecture": "arm64", "fileName": "ATL-WSL-0.2.0-arm64.wsl", "url": "", "sha256": "", "sizeBytes": 0, "mediaType": "application/vnd.microsoft.wsl" },
+    { "role": "manager", "architecture": "arm64", "fileName": "ATL-WSL-Manager-0.2.0-win-arm64.zip", "url": "", "sha256": "", "sizeBytes": 0, "mediaType": "application/zip" },
+    { "role": "runtimeBundle", "architecture": "arm64", "fileName": "ATL-WSL-Runtime-0.2.0-arm64.tar.gz", "url": "", "sha256": "", "sizeBytes": 0, "mediaType": "application/gzip" }
+  ]
+}

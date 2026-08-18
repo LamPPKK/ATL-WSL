@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/LamPPKK/ATL-WSL/raw/main/config/release-manifest.schema.json",
+  "title": "ATL-WSL release manifest v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "product", "version", "channel", "publishedAtUtc", "minimumManagerVersion", "minimumWslVersion", "signingKeyId", "components", "compatibility", "artifacts"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "schemaVersion": { "const": 2 },
+    "product": { "const": "atl-wsl" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:[-+][0-9A-Za-z.-]+)?$" },
+    "channel": { "enum": ["development", "preview", "stable"] },
+    "publishedAtUtc": { "type": "string", "format": "date-time" },
+    "minimumManagerVersion": { "type": "string" },
+    "minimumWslVersion": { "type": "string" },
+    "signingKeyId": { "type": "string", "minLength": 1 },
+    "components": { "type": "object", "additionalProperties": { "type": "string" } },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["supportedArchitectures", "renderer", "tier"],
+      "properties": {
+        "supportedArchitectures": { "type": "array", "uniqueItems": true, "items": { "enum": ["x64", "arm64"] } },
+        "renderer": { "const": "llvmpipe" },
+        "tier": { "type": "string" }
+      }
+    },
+    "artifacts": { "type": "array", "minItems": 6, "items": { "$ref": "#/$defs/artifact" } }
+  },
+  "$defs": {
+    "artifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["role", "architecture", "fileName", "url", "sha256", "sizeBytes", "mediaType"],
+      "properties": {
+        "role": { "enum": ["rootfs", "manager", "runtimeBundle"] },
+        "architecture": { "enum": ["x64", "arm64"] },
+        "fileName": { "type": "string", "pattern": "^[^/\\\\]+$" },
+        "url": { "type": "string" },
+        "sha256": { "type": "string", "pattern": "^([0-9a-f]{64})?$" },
+        "sizeBytes": { "type": "integer", "minimum": 0 },
+        "mediaType": { "type": "string" }
+      }
+    }
+  }
+}

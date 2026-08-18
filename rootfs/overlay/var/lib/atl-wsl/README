@@ -1,0 +1,3 @@
+This directory is owned by ATL-WSL. The first-run marker and selected default
+user are stored here. User APKs and mutable Android data are stored below the
+default user's home directory, never on DrvFs by default.

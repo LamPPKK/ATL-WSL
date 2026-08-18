@@ -1,0 +1,33 @@
+{
+  "profiles": [
+    {
+      "colorScheme": "ATL-WSL",
+      "font": { "face": "Cascadia Mono" },
+      "opacity": 96,
+      "useAcrylic": true
+    }
+  ],
+  "schemes": [
+    {
+      "name": "ATL-WSL",
+      "background": "#101318",
+      "foreground": "#E6EAF0",
+      "black": "#101318",
+      "red": "#D95D63",
+      "green": "#55B98A",
+      "yellow": "#D7A84B",
+      "blue": "#5D8FD8",
+      "purple": "#9B7AC7",
+      "cyan": "#58B7BD",
+      "white": "#D8DEE8",
+      "brightBlack": "#657080",
+      "brightRed": "#F07A80",
+      "brightGreen": "#73D6A7",
+      "brightYellow": "#F0C56A",
+      "brightBlue": "#7CAEEF",
+      "brightPurple": "#B798E0",
+      "brightCyan": "#78D3D7",
+      "brightWhite": "#FFFFFF"
+    }
+  ]
+}

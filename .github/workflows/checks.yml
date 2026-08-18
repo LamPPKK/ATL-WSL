@@ -1,0 +1,60 @@
+name: Checks
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install validation tools
+        run: sudo apt-get update && sudo apt-get install --yes shellcheck libxml2-utils
+      - name: Test runtime
+        run: python3 -m unittest discover -s tests -v
+      - name: Validate Python and shell
+        run: |
+          python3 -m py_compile runtime/atl_wsl.py tools/create-release-manifest.py tools/create-sbom.py
+          shellcheck build/*.sh build/lib/*.sh rootfs/overlay/usr/bin/atl-wsl rootfs/overlay/usr/libexec/atl-wsl-oobe rootfs/overlay/usr/libexec/atl-wsl-system
+      - name: Validate structured files
+        shell: bash
+        run: |
+          python3 -m json.tool config/release-manifest.schema.json >/dev/null
+          python3 -m json.tool config/release-manifest.template.json >/dev/null
+          while IFS= read -r file; do xmllint --noout "$file"; done < <(find src -name '*.xaml' -o -name '*.csproj' -o -name '*.slnx')
+
+  manager:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: windows-2025
+            rid: win-x64
+          - runner: windows-11-arm
+            rid: win-arm64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.400
+      - name: Build manager
+        run: dotnet build .\ATLWSL.slnx --configuration Release --runtime ${{ matrix.rid }}
+      - name: Test manager bridge
+        run: dotnet run --project .\tests\ATLWSL.Core.Smoke\ATLWSL.Core.Smoke.csproj --configuration Release
+      - name: Parse PowerShell scripts
+        shell: pwsh
+        run: |
+          $allErrors = @()
+          Get-ChildItem scripts -Filter *.ps1 | ForEach-Object {
+            $tokens = $null
+            $parseErrors = $null
+            [void][System.Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$tokens, [ref]$parseErrors)
+            $allErrors += $parseErrors
+          }
+          if ($allErrors.Count) { $allErrors | Format-List | Out-String | Write-Error }

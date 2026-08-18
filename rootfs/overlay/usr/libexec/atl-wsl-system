@@ -1,0 +1,83 @@
+#!/bin/sh
+
+set -eu
+[ "$(id -u)" -eq 0 ] || { echo 'atl-wsl-system must run as root' >&2; exit 1; }
+
+state=/var/lib/atl-wsl
+transaction=$state/update-transaction.json
+backup=$state/update-backup
+staging=$state/update-staging
+
+repair() {
+    command -v android-translation-layer >/dev/null
+    command -v bwrap >/dev/null
+    test -f /etc/profile.d/atl-wsl.sh
+    chmod 0755 /usr/bin/atl-wsl /usr/lib/atl-wsl/atl_wsl.py /usr/libexec/atl-wsl-oobe "$0"
+    apk info -vv | sort > /usr/share/atl-wsl/package-inventory.txt
+    sha256sum /usr/share/atl-wsl/package-inventory.txt | awk '{print $1}' \
+        > /usr/share/atl-wsl/package-inventory.sha256
+}
+
+update_runtime() {
+    test "$#" -eq 1 || { echo 'update requires a bundle' >&2; exit 2; }
+    bundle=$1
+    test -f "$bundle"
+    rm -rf "$staging"
+    install -d "$staging" "$backup"
+    tar -xzf "$bundle" -C "$staging" --no-same-owner
+    test -f "$staging/SHA256SUMS"
+    (cd "$staging" && sha256sum -c SHA256SUMS)
+    test -d "$staging/overlay"
+
+    rm -rf "$backup"
+    install -d "$backup/overlay/usr/lib/atl-wsl" "$backup/overlay/usr/bin" "$backup/overlay/usr/libexec"
+    cp -a /usr/lib/atl-wsl/. "$backup/overlay/usr/lib/atl-wsl/"
+    cp -a /usr/bin/atl-wsl "$backup/overlay/usr/bin/"
+    cp -a /usr/libexec/atl-wsl-oobe /usr/libexec/atl-wsl-system "$backup/overlay/usr/libexec/"
+    if test -d /usr/share/atl-wsl/recovery-packages; then
+        install -d "$backup/recovery-packages"
+        cp -a /usr/share/atl-wsl/recovery-packages/. "$backup/recovery-packages/"
+    fi
+    apk info -vv | sort > "$backup/package-inventory.txt"
+    apk info | sort > "$backup/package-names.txt"
+    printf '{"schemaVersion":1,"stage":"applying"}\n' > "$transaction"
+
+    if find "$staging/packages" -name '*.apk' -type f -print -quit 2>/dev/null | grep -q .; then
+        find "$staging/packages" -name '*.apk' -type f \
+            -exec apk add --no-network --allow-untrusted '{}' +
+        rm -rf /usr/share/atl-wsl/recovery-packages
+        install -d /usr/share/atl-wsl/recovery-packages
+        find "$staging/packages" -name '*.apk' -type f \
+            -exec cp -p '{}' /usr/share/atl-wsl/recovery-packages/ \;
+    fi
+    cp -a "$staging/overlay/." /
+    repair
+    printf '{"schemaVersion":1,"stage":"awaitingDoctor"}\n' > "$transaction"
+}
+
+rollback() {
+    test -d "$backup/overlay" || { echo 'no update backup exists' >&2; exit 2; }
+    if find "$backup/recovery-packages" -name '*.apk' -type f -print -quit 2>/dev/null | grep -q .; then
+        find "$backup/recovery-packages" -name '*.apk' -type f \
+            -exec apk add --no-network --allow-untrusted '{}' +
+        rm -rf /usr/share/atl-wsl/recovery-packages
+        install -d /usr/share/atl-wsl/recovery-packages
+        cp -a "$backup/recovery-packages/." /usr/share/atl-wsl/recovery-packages/
+    fi
+    apk info | sort > "$backup/current-package-names.txt"
+    comm -13 "$backup/package-names.txt" "$backup/current-package-names.txt" > "$backup/extra-package-names.txt"
+    if test -s "$backup/extra-package-names.txt"; then
+        xargs apk del -- < "$backup/extra-package-names.txt"
+    fi
+    cp -a "$backup/overlay/." /
+    rm -f "$transaction"
+    repair
+}
+
+case "${1:-}" in
+    repair) shift; test "$#" -eq 0; repair ;;
+    update) shift; update_runtime "$@" ;;
+    update-rollback) shift; test "$#" -eq 0; rollback ;;
+    update-commit) shift; test "$#" -eq 0; test -f "$transaction"; rm -f "$transaction" ;;
+    *) echo 'usage: atl-wsl-system repair|update BUNDLE|update-rollback|update-commit' >&2; exit 2 ;;
+esac

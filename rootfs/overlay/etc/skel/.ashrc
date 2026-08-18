@@ -1,0 +1,5 @@
+alias ll='ls -lah'
+
+if [ -t 1 ]; then
+    printf 'ATL-WSL: run "atl-wsl doctor" or open ATL-WSL Manager on Windows.\n'
+fi

@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="src/ATLWSL.Core/ATLWSL.Core.csproj" />
+  <Project Path="src/ATLWSL.Manager/ATLWSL.Manager.csproj" />
+  <Project Path="tests/ATLWSL.Core.Smoke/ATLWSL.Core.Smoke.csproj" />
+</Solution>

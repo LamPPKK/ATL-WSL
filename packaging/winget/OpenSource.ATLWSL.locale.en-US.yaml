@@ -1,0 +1,11 @@
+PackageIdentifier: OpenSource.ATLWSL
+PackageVersion: 0.2.0
+PackageLocale: en-US
+Publisher: ATL-WSL contributors
+PackageName: ATL-WSL Manager
+License: GPL-3.0-only
+LicenseUrl: https://github.com/LamPPKK/ATL-WSL/blob/v0.2.0/LICENSE
+ShortDescription: Manage a verified Android Translation Layer runtime on WSL.
+PackageUrl: https://github.com/LamPPKK/ATL-WSL
+ManifestType: defaultLocale
+ManifestVersion: 1.10.0

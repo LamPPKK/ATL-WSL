@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.22000.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <RootNamespace>AtlWsl.Manager</RootNamespace>
+    <AssemblyName>ATL-WSL Manager</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <SelfContained>true</SelfContained>
+    <PublishSingleFile>true</PublishSingleFile>
+    <RuntimeIdentifier Condition="'$(RuntimeIdentifier)' == ''">win-x64</RuntimeIdentifier>
+    <ReleaseKeyRingPath Condition="'$(ReleaseKeyRingPath)' == ''">$(MSBuildThisFileDirectory)..\..\config\release-public-keys.json</ReleaseKeyRingPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../ATLWSL.Core/ATLWSL.Core.csproj" />
+    <None Include="../../assets/atl-wsl.svg" Link="Assets/atl-wsl.svg" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="$(ReleaseKeyRingPath)" LogicalName="ATLWSL.ReleasePublicKeys.json" />
+  </ItemGroup>
+</Project>
